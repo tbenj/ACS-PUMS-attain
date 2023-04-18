@@ -21,11 +21,11 @@ attendees via GitHub.
 
 ## Presentation
 
-Render `presentation.qmd` using [Quarto](quarto.org).
+Render `presentation.qmd` using [Quarto](https://quarto.org).
 
 ## Report
 
-Adjust YAML code (especially `params$geoids`), then render `report.qmd` using [Quarto](quarto.org).
+Adjust YAML code (especially `params$geoids`), then render `report.qmd` using [Quarto](https://quarto.org).
 
 ## For questions
 

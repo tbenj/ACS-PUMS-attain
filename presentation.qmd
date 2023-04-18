@@ -3,13 +3,22 @@ title: "Exploring Educational Attainment in Your Service Area Using ACS PUMS, R,
 subtitle: "OAIRP Spring Conference 2023"
 author: "Thomas Jay Benjamin"
 format: pptx
+params:
+    PUMA1: "00801"
+    PUMA2: "00802"
+    PUMA3: NULL
+    PUMA4: NULL
+execute:
+    freeze: auto
 ---
 
 ## Today's session
 
+::: {.incremental}
 1. Review the basics of the American Community Survey
 2. Walkthrough a report on educational attainment that you can run for your service area
-3. Discuss how the report (and this presentation***!***) were built
+3. Discuss how the report (*and this presentation!*) were built
+:::
 
 # Exploring Educational Attainment using the American Community Survey
 
@@ -55,6 +64,14 @@ format: pptx
 
 ::::
 
+## ACS PUMS data
+
+```{R}
+#| include: false
+#| cache: true
+#| file: getPUMSdata.R
+```
+
 
 # How did we do it?  ACS data using R
 
@@ -62,7 +79,7 @@ format: pptx
 
 - You will need (all ***free!***):
     - an installation of the **`R`** ***statistical software system***
-        - We'll need to install a few ***packages*** which will be shown in the slides that follow
+        - We'll need to install a few ***packages*** in the slides that follow
 
     - an ***IDE***
         - I recommend Microsoft's **Visual Studio Code** but **RStudio** works well too
@@ -72,6 +89,7 @@ format: pptx
         - Quarto will request that you install **`TinyTex`**
         - If using Visual Studio Code, install the **Quarto extension**
     
+    - *Recommended*: **Git** ***version control system*** and **GitHub** account
 
 ## tidycensus
 
