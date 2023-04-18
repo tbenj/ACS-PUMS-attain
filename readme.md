@@ -25,7 +25,7 @@ Render `presentation.qmd` using [Quarto](https://quarto.org).
 
 ## Report
 
-Adjust YAML code (especially `params$geoids`), then render `report.qmd` using [Quarto](https://quarto.org).
+Adjust YAML code (especially `params$PUMA` variables), then render `report.qmd` using [Quarto](https://quarto.org).
 
 ## For questions
 
