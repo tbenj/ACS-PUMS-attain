@@ -1,0 +1,77 @@
+---
+title: "Exploring Educational Attainment in Your Service Area Using ACS PUMS, R, & Quarto"
+subtitle: "OAIRP Spring Conference 2023"
+author: "Thomas Jay Benjamin"
+format: pptx
+---
+
+## Today's session
+
+1. Review the basics of the American Community Survey
+2. Walkthrough a report on educational attainment that you can run for your service area
+3. Discuss how the report (and this presentation***!***) were built
+
+# Exploring Educational Attainment using the American Community Survey
+
+## American Community Survey
+
+- The **American Community Survey** is an annual survey conducted by the Census Bureau.  
+- It essentially replaced the long form of the U.S. Census.
+- 
+
+## Geography
+
+:::: {.columns}
+
+::: {.column}
+- The Census Bureau collects data at many levels of geography:^[Read more about Census geographies: <https://www.census.gov/programs-surveys/geography/guidance.html>]
+    - States
+    - Metro areas (*Metropolitan Statistical Areas*)
+    - Counties
+    - Tracts
+    - Blocks
+    - ... and other combinations of these
+:::
+
+::: {.column}
+![Census geography hierarchy](geographies.png)
+:::
+
+::::
+
+## Public Use Microdata Sample
+
+:::: {.columns}
+
+::: {.column}
+- The ***Public Use Microdata Sample*** is a subset of ACS responses that are available as survey data files.
+- The geography level available for the PUMS is the ***Public Use Microdata Area***.^[See the Ohio PUMAs here: <https://www.census.gov/geographies/reference-maps/2010/geo/2010-pumas/ohio.html>]
+- PUMAs are typcally made up of Census Tracts, which aggregate to counties.
+:::
+
+::: {.column}
+![Lorain County PUMAs](LC_PUMAs.png)
+:::
+
+::::
+
+
+# How did we do it?  ACS data using R
+
+## Getting started with R & Quarto
+
+- You will need (all ***free!***):
+    - an installation of the **`R`** ***statistical software system***
+        - We'll need to install a few ***packages*** which will be shown in the slides that follow
+
+    - an ***IDE***
+        - I recommend Microsoft's **Visual Studio Code** but **RStudio** works well too
+        - If using Visual Studio Code, install the **`R` extension for Visual Studio Code**
+
+    - an installation of the ***publishing system*** **Quarto**
+        - Quarto will request that you install **`TinyTex`**
+        - If using Visual Studio Code, install the **Quarto extension**
+    
+
+## tidycensus
+
