@@ -4,11 +4,13 @@ subtitle: "OAIRP Spring Conference 2023"
 author: "Thomas Jay Benjamin"
 format: pptx
 params:
+    service-area: "Lorain County Community College: Lorain County"
     PUMA1: "00801"
     PUMA2: "00802"
     PUMA3: NULL
     PUMA4: NULL
 execute:
+    cache: true
     freeze: auto
 ---
 
@@ -43,7 +45,7 @@ execute:
 :::
 
 ::: {.column}
-![Census geography hierarchy](geographies.png)
+![Census geography hierarchy](images/geographies.png)
 :::
 
 ::::
@@ -59,12 +61,40 @@ execute:
 :::
 
 ::: {.column}
-![Lorain County PUMAs](LC_PUMAs.png)
+![Lorain County PUMAs](images/LC_PUMAs.png)
 :::
 
 ::::
 
-## ACS PUMS data
+## A bit about the ACS PUMS data
+- The ACS is a sample of approximately 1% of Americans, with the 5-year data based on a 5% sample
+- ACS questionnaire includes household and person items, and thus two weights are included in the data
+- The [data dictionary](https://www.census.gov/programs-surveys/acs/microdata/documentation.html) provides information on the nearly 200 items (and additional recoded and derived variables)
+- ACS PUMS information and data can be accessed here: <https://www.census.gov/programs-surveys/acs/microdata.html>
+
+
+## Accessing ACS PUMS data
+
+- You can access the ACS PUMS data via:
+    - The online [Microdata Access Tool (MDAT)](https://data.census.gov/mdat/#/)
+    - The Census Bureau [FTP site](https://www2.census.gov/programs-surveys/acs/data/pums/)
+    - The [Census Microdata API](https://www.census.gov/data/developers/data-sets/census-microdata-api.html)
+        - You can request a free key for the API at the [Census Developer's site](https://www.census.gov/content/dam/Census/data/developers/api-user-guide/api-guide.pdf) ^[Registering for and using a key is required if running 500+ queries, but it is good practice to get and use one nonetheless.]
+        - There are open-source software packages that interact with the Census APIs, one of which we will review today.
+
+## Pulling ACS data on Educational Attainment
+
+```{R}
+#| include: false
+#| cache: true
+
+# load necessary libraries
+library("tidycensus")
+library("tidyverse")
+library("survey")
+library("srvyr")
+library("knitr")
+```
 
 ```{R}
 #| include: false
@@ -72,12 +102,31 @@ execute:
 #| file: getPUMSdata.R
 ```
 
+:::: {.columns}
+::: {.column}
+- After data pre-processing, have data for 7 raw variables we'll be using^[Plus recoded variables and additional identifiers] for the two PUMAs in Lorain County:
+    - AGEP age
+    - CIT citizenship
+    - SCHL educational attainment
+    - ESR employment status
+    - HISP Hispanic/Latino origin
+    - RAC1P race
+    - SOCP occupation
+:::
+::: {.column}
+```{R}
+#| echo: false
+#| file: summarytable.R
+```
+:::
+::::
 
 # How did we do it?  ACS data using R
 
 ## Getting started with R & Quarto
 
 - You will need (all ***free!***):
+
     - an installation of the **`R`** ***statistical software system***
         - We'll need to install a few ***packages*** in the slides that follow
 
@@ -91,5 +140,24 @@ execute:
     
     - *Recommended*: **Git** ***version control system*** and **GitHub** account
 
-## tidycensus
+## **`tidycensus`** and other useful `R` packages
 
+
+
+## Questions? [Find me in the OAIRP directory](https://oairp.org/Directory)
+
+:::: {.columns}
+
+::: {.column}
+<https://github.com/tbenj/ACS-PUMS-attain>
+
+![Access the resources on GitHub](images/qrcode_github.com.png)
+:::
+
+::: {.column}
+<https://bit.ly/SurveyOAIRP2023SP>
+
+![Fill out the OAIRP session evaluation](images/OAIRP_eval.png)
+:::
+
+::::

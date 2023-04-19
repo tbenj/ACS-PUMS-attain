@@ -3,14 +3,15 @@ library("tidycensus")
 library("tidyverse")
 library("survey")
 library("srvyr")
+library("knitr")
 
 # pull ACS PUMS data
 pums_data <- get_pums(
     year = 2021,
     variables = c("AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT"),
     state = "OH",
-    puma = c(params$PUMA1, params$PUMA2,
-        params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
+    puma = c("00801","00802"), #c(params$PUMA1, params$PUMA2,
+        #params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
     survey = "acs5",
     recode = TRUE,
     rep_weights = "person",
@@ -22,4 +23,38 @@ pums_survey_data <- pums_data %>%
     to_survey(
         type = "person",
         design = "rep_weights"
+    ) %>%
+    mutate(
+        degree = case_when(
+            SCHL >= 22 ~ "Graduate degree",
+            SCHL >= 21 ~ "Bachelor's degree",
+            SCHL == 20 ~ "Associate's degree",
+            SCHL >= 18 ~ "Some college, no degree",
+            SCHL >= 16 ~ "High school graduate",
+            TRUE ~ "Less than high school"
+        ),
+        has_degree = SCHL >= 20,
+        age_gr = case_when(
+            AGEP >= 65 ~ "65+",
+            AGEP >= 55 ~ "55-64",
+            AGEP >= 45 ~ "45-54",
+            AGEP >= 35 ~ "35-44",
+            AGEP >= 25 ~ "25-34",
+            AGEP >= 18 ~ "18-24",
+            TRUE ~ "0-17"
+        ),
+        race_ethn = case_when(
+            CIT == "5" ~ "U.S. Nonresident",
+            HISP != "01" ~ "Hispanic or Latino",
+            RAC1P == "1" ~ "White",
+            RAC1P == "2" ~ "Black or African American",
+            RAC1P == "9" ~ "Two or more races",
+            RAC1P == "6" ~ "Asian",
+            RAC1P == "8" ~ "Unknown / some other race",
+            RAC1P == "3" | RAC1P == "5" ~ "American Indian or Alaska Native",
+            RAC1P == "7" ~ "Native Hawaiian or Pacific Islander",
+            TRUE ~ RAC1P
+        )
     )
+
+# write.csv(pums_survey_data, "test.csv")
