@@ -29,4 +29,4 @@ Adjust YAML code (especially `params$PUMA` variables), then render `report.qmd` 
 
 ## For questions
 
-Contact the author, Thomas Benjamin, through the [OAIRP portal](https://oairp.org/Directory).
+Contact the author, Thomas Jay Benjamin, through the [OAIRP portal](https://oairp.org/Directory).
