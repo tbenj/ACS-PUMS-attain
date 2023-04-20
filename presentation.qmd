@@ -16,18 +16,27 @@ execute:
 
 ## Today's session
 
+:::: {.columns}
+::: {.column}
 ::: {.incremental}
 1. Review the basics of the **American Community Survey**
 2. Walkthrough a ***parameterized* report on educational attainment** that you can run for your service area
 3. Discuss how the report (*and this presentation!*) were built using **free and mostly open-source software**
 :::
+:::
+::: {.column}
+![](https://oairp.org/resources/Pictures/OAIRP%20Spring%202023%20Conference%20Logo%20FINAL%20(1).png)
+:::
+::::
 
 # Exploring Educational Attainment using the American Community Survey
 
 ## American Community Survey
 
-- The **American Community Survey** is an annual survey conducted by the Census Bureau.  
+- The **American Community Survey** is an annual survey conducted by the Census Bureau.
 - It essentially replaced the long form of the U.S. Census.
+- The ACS is a sample of approximately 1% of the U.S. population, with the 5-year data based on a 5% sample.
+- The ACS questionnaire includes household and person items.
 
 ## Geography
 
@@ -55,7 +64,7 @@ execute:
 
 ::: {.column}
 - The ***Public Use Microdata Sample*** is a subset of ACS responses that are available as survey data files.
-- The geography level available for the PUMS is the ***Public Use Microdata Area***.^[See the Ohio PUMAs here: <https://www.census.gov/geographies/reference-maps/2010/geo/2010-pumas/ohio.html>]
+- The geography level available for the PUMS is the ***Public Use Microdata Area***.
 - PUMAs are typcally made up of Census Tracts, which aggregate to counties.
 :::
 
@@ -65,9 +74,14 @@ execute:
 
 ::::
 
+## Let's pause and check out the Ohio PUMAs
+
+![<https://www.census.gov/geographies/reference-maps/2010/geo/2010-pumas/ohio.html>](images/qrcode_OH_PUMAS.png)
+
+
 ## A bit about the ACS PUMS data
-- The ACS is a sample of approximately 1% of Americans, with the 5-year data based on a 5% sample
-- ACS questionnaire includes household and person items, and thus two weights are included in the data
+- A de-identified sample - about 2/3 of the overall responses (with minor changes to protect privacy)
+- Includes weights to calculate population and household totals
 - The [data dictionary](https://www.census.gov/programs-surveys/acs/microdata/documentation.html) provides information on the nearly 200 items (and additional recoded and derived variables)
 - ACS PUMS information and data can be accessed here: <https://www.census.gov/programs-surveys/acs/microdata.html>
 
@@ -131,8 +145,8 @@ library("knitr")
 Open strategic conversations on campus related to:
 
 - Enrollment pipelines and demographic change
-- Engaging disengaged youth
-- Pathways needed to facilitate entry into careers with high replacement need in the near future
+- Strategize about reaching disengaged youth
+- Building pathways needed to facilitate entry into careers with high replacement need in the near future
 :::
 
 ::: {.column}
@@ -207,6 +221,8 @@ Help IR connect with offices like:
 - Hongzhi Ma's workshop on *Application of Propensity Score Matching in Institutional Research* using R at the **Spring 2019 OAIRP Conference** (at LCCC!)
 
 - Meghan Hall's [slides from a July 2022 NEAIR virtual workshop on using R in IR](https://meghan.rbind.io/talk/neair/)  which included parameterized reports and building slides using code
+
+- LCCC Data Analytics student, Tim Kenny, who has been learning to use R and Quarto during an internship with me in LCCC IR
 
 
 ## Questions? [Find me in the OAIRP directory](https://oairp.org/Directory)
