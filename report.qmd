@@ -1,10 +1,31 @@
+---
+title: "Educational Attainment in Our Service Area"
+author: "Based on work by Thomas Jay Benjamin as presented at the OAIRP Spring Conference 2023"
+format:
+    html:
+        code-fold: true
+params:
+    servicearea: "LCCC: Lorain County"
+    PUMA1: "00801"
+    PUMA2: "00802"
+    PUMA3: NULL
+    PUMA4: NULL
+---
+
+```{R}
+#| include: false
+
 # load necessary libraries
 library("tidycensus")
 library("tidyverse")
 library("survey")
 library("srvyr")
 library("knitr")
+```
 
+```{R}
+#| include: false
+#| cache: true
 # pull ACS PUMS data
 pums_data <- get_pums(
     year = 2021,
@@ -14,8 +35,7 @@ pums_data <- get_pums(
         #params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
     survey = "acs5",
     recode = TRUE,
-    rep_weights = "person",
-    show_call = TRUE
+    rep_weights = "person"
 )
 
 # format ACS PUMS as survey data
@@ -65,5 +85,45 @@ pums_survey_data <- pums_data %>%
             TRUE ~ RAC1P
         )
     )
+```
 
-# write.csv(pums_survey_data, "test.csv")
+
+- After data pre-processing, have data for 7 raw variables we'll be using^[Plus recoded variables and additional identifiers] for the PUMAs associated with the service area for `r params$servicearea`.
+    - AGEP age
+    - CIT citizenship
+    - SCHL educational attainment
+    - ESR employment status
+    - HISP Hispanic/Latino origin
+    - RAC1P race
+    - SOCP occupation
+
+```{R}
+pums_survey_data %>%
+    group_by(PUMA) %>%
+    summarize(
+        records = n(),
+        weighted = survey_total(vartype = c("ci"), level = 0.95)
+    ) %>%
+    bind_rows(
+        summarize(., across(where(is.numeric), sum),
+            across(where(is.character), ~ 'Total')
+            )
+        ) %>%
+    kable(digits = 0, format.args = list(big.mark = ","))
+```
+
+
+## Educational attainment by age group
+
+ ```{R}
+pums_survey_data %>%
+    filter(AGEP >= 25 & AGEP < 65) %>%
+    group_by(age_gr, degree) %>%
+    summarize(n = survey_prop(proportion = TRUE, vartype = c("ci"), level = 0.95)) %>%
+    arrange(age_gr, rev(degree)) %>%
+    mutate(label_y = cumsum(n)/sum(n)) %>%
+    ggplot(aes(fill = degree, x = age_gr, y = n)) +
+        geom_bar(position = "fill", stat = "identity", color = "black") +
+        geom_text(aes(y = label_y, label = scales::percent(label_y, accuracy = .1), vjust = 1.5)) +
+        scale_fill_brewer("Blues")
+ ```

@@ -1,3 +1,6 @@
+library("tidyverse")
+library("knitr")
+
 pums_survey_data %>%
     group_by(PUMA) %>%
     summarize(
@@ -5,7 +8,7 @@ pums_survey_data %>%
         weighted = survey_total(vartype = c("ci"), level = 0.95)
     ) %>%
     bind_rows(
-        summarise(., across(where(is.numeric), sum),
+        summarize(., across(where(is.numeric), sum),
             across(where(is.character), ~ 'Total')
             )
         ) %>%
