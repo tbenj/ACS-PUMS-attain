@@ -9,4 +9,4 @@ pums_survey_data %>%
             across(where(is.character), ~ 'Total')
             )
         ) %>%
-    kable(digits = 0, format.args = list(big.mark = ","), caption = "Lorain County, OH PUMAs")
+    kable(digits = 0, format.args = list(big.mark = ","))

@@ -4,7 +4,7 @@ subtitle: "OAIRP Spring Conference 2023"
 author: "Thomas Jay Benjamin"
 format: pptx
 params:
-    service-area: "Lorain County Community College: Lorain County"
+    servicearea: "LCCC: Lorain County"
     PUMA1: "00801"
     PUMA2: "00802"
     PUMA3: NULL
@@ -17,9 +17,9 @@ execute:
 ## Today's session
 
 ::: {.incremental}
-1. Review the basics of the American Community Survey
-2. Walkthrough a report on educational attainment that you can run for your service area
-3. Discuss how the report (*and this presentation!*) were built
+1. Review the basics of the **American Community Survey**
+2. Walkthrough a ***parameterized* report on educational attainment** that you can run for your service area
+3. Discuss how the report (*and this presentation!*) were built using **free and mostly open-source software**
 :::
 
 # Exploring Educational Attainment using the American Community Survey
@@ -28,14 +28,13 @@ execute:
 
 - The **American Community Survey** is an annual survey conducted by the Census Bureau.  
 - It essentially replaced the long form of the U.S. Census.
-- 
 
 ## Geography
 
 :::: {.columns}
 
 ::: {.column}
-- The Census Bureau collects data at many levels of geography:^[Read more about Census geographies: <https://www.census.gov/programs-surveys/geography/guidance.html>]
+- The Census Bureau collects data at many levels of geography:^[Read more about Census geographies: <https://www.census.gov/programs-surveys/geography/guidance.html>] 
     - States
     - Metro areas (*Metropolitan Statistical Areas*)
     - Counties
@@ -75,12 +74,13 @@ execute:
 
 ## Accessing ACS PUMS data
 
-- You can access the ACS PUMS data via:
-    - The online [Microdata Access Tool (MDAT)](https://data.census.gov/mdat/#/)
-    - The Census Bureau [FTP site](https://www2.census.gov/programs-surveys/acs/data/pums/)
-    - The [Census Microdata API](https://www.census.gov/data/developers/data-sets/census-microdata-api.html)
-        - You can request a free key for the API at the [Census Developer's site](https://www.census.gov/content/dam/Census/data/developers/api-user-guide/api-guide.pdf) ^[Registering for and using a key is required if running 500+ queries, but it is good practice to get and use one nonetheless.]
-        - There are open-source software packages that interact with the Census APIs, one of which we will review today.
+You can access the ACS PUMS data via:
+
+- The online [Microdata Access Tool (MDAT)](https://data.census.gov/mdat/#/)
+- The Census Bureau [FTP site](https://www2.census.gov/programs-surveys/acs/data/pums/)
+- The [Census Microdata API](https://www.census.gov/data/developers/data-sets/census-microdata-api.html)
+    - You can request a free API key at the [Census Developers site](https://www.census.gov/data/developers/guidance.html) ^[Registering for and using a key is required if running 500+ queries, but it is good practice to get and use one nonetheless.]
+    - There are open-source software packages that interact with the Census APIs, one of which we will review today.
 
 ## Pulling ACS data on Educational Attainment
 
@@ -104,7 +104,7 @@ library("knitr")
 
 :::: {.columns}
 ::: {.column}
-- After data pre-processing, have data for 7 raw variables we'll be using^[Plus recoded variables and additional identifiers] for the two PUMAs in Lorain County:
+- After data pre-processing, have data for 7 raw variables we'll be using^[Plus recoded variables and additional identifiers] for the PUMAs associated with the service area for `r params$servicearea`.
     - AGEP age
     - CIT citizenship
     - SCHL educational attainment
@@ -121,27 +121,92 @@ library("knitr")
 :::
 ::::
 
-# How did we do it?  ACS data using R
+# Demo #1: the report
 
-## Getting started with R & Quarto
+## How you might use the report
+
+:::: {.columns}
+
+::: {.column}
+Open strategic conversations on campus related to:
+
+- Enrollment pipelines and demographic change
+- Engaging disengaged youth
+- Pathways needed to facilitate entry into careers with high replacement need in the near future
+:::
+
+::: {.column}
+Help IR connect with offices like:
+
+- Workforce Development
+- School & Community Partnerships
+- Diversity, Equity, & Inclusion
+- With additional data:
+    - Veterans & Servicemembers Center, Accessibility Services, etc.
+:::
+
+::::
+
+# How did we do it?  ACS data using `R`
+
+## Getting started with `R` & Quarto
 
 - You will need (all ***free!***):
 
-    - an installation of the **`R`** ***statistical software system***
+    - an installation of the [**`R`**](https://www.r-project.org/) ***statistical software system***
         - We'll need to install a few ***packages*** in the slides that follow
 
     - an ***IDE***
-        - I recommend Microsoft's **Visual Studio Code** but **RStudio** works well too
-        - If using Visual Studio Code, install the **`R` extension for Visual Studio Code**
+        - I recommend Microsoft's [**Visual Studio Code**](https://code.visualstudio.com/) but [**RStudio**](https://posit.co/products/open-source/rstudio/) works well too^[Microsoft acknowledges that Visual Studio Code is "Built on Open Source" but the main distribution includes some proprietary Microsoft features]
+        - If using Visual Studio Code, install the [**`R` extension for Visual Studio Code**](https://marketplace.visualstudio.com/items?itemName=REditorSupport.r)
 
-    - an installation of the ***publishing system*** **Quarto**
-        - Quarto will request that you install **`TinyTex`**
-        - If using Visual Studio Code, install the **Quarto extension**
-    
-    - *Recommended*: **Git** ***version control system*** and **GitHub** account
+    - an installation of the ***publishing system*** [**Quarto**](https://quarto.org/)
+        - Quarto will request that you install [**`TinyTex`**](https://yihui.org/tinytex/) and [**`knitr`**](https://yihui.org/knitr/)
+        - If using Visual Studio Code, install the [**Quarto extension**](https://marketplace.visualstudio.com/items?itemName=quarto.quarto)
+
+    - *Recommended*: [**Git**](https://git-scm.com/) ***version control system*** and [**GitHub**](https://github.com/) account
 
 ## **`tidycensus`** and other useful `R` packages
 
+:::: {.columns}
+
+::: {.column}
+[`tidycensus`](https://walker-data.com/tidycensus/) is an `R` package that connects with Census APIs.
+
+![](https://walker-data.com/tidycensus/logo.png)
+:::
+
+::: {.column}
+[`survyr`](http://gdfe.co/srvyr/) and [`survey`](http://r-survey.r-forge.r-project.org/survey/) work with survey data.
+
+![](http://gdfe.co/srvyr/tools/logo.png)
+:::
+
+::::
+
+## About the **`tidyverse`**
+
+:::: {.columns}
+
+::: {.column}
+[`tidyverse`](https://www.tidyverse.org/) is a set of `R` packages with a common design that "make data science faster".
+
+`tidycensus` and `survyr` are designed for compatibility with `tidyverse`, using similar grammar and data structure.
+:::
+
+::: {.column}
+![](https://tidyverse.tidyverse.org/logo.png)
+:::
+
+::::
+
+# Demo #2: generating the parameterized report using `R` & Quarto
+
+## A few quick shout-outs
+
+- Hongzhi Ma's workshop on *Application of Propensity Score Matching in Institutional Research* using R at the **Spring 2019 OAIRP Conference** (at LCCC!)
+
+- Meghan Hall's [slides from a July 2022 NEAIR virtual workshop on using R in IR](https://meghan.rbind.io/talk/neair/)  which included parameterized reports and building slides using code
 
 
 ## Questions? [Find me in the OAIRP directory](https://oairp.org/Directory)
