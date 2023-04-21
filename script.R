@@ -18,7 +18,7 @@ pums_data <- get_pums(
     show_call = TRUE
 )
 
-# format ACS PUMS as survey data
+# format ACS PUMS as survey data and create derived variables
 pums_survey_data <- pums_data %>%
     to_survey(
         type = "person",
@@ -87,16 +87,65 @@ pums_survey_data %>%
 pums_survey_prime_age <- pums_survey_data %>%
     filter(AGEP >= 25 & AGEP < 65) %>%
     group_by(age_gr, degree) %>%
-    summarize(n = survey_mean(proportion = TRUE, vartype = c("ci"), level = 0.95))
+    summarize(
+        pct = survey_mean(proportion = TRUE, vartype = c("ci"), level = 0.95),
+        n = survey_total(vartype = c("ci"), level = 0.95)
+        )
 
 
 pums_survey_prime_age %>%
     arrange(age_gr, rev(degree)) %>%
     mutate(label_y = cumsum(n)/sum(n)) %>%
-    ggplot(aes(fill = degree, x = age_gr, y = n)) +
+    ggplot(aes(fill = degree, x = age_gr, y = pct)) +
         geom_bar(position = "fill", stat = "identity", color = "black") +
         scale_fill_brewer(palette = "Blues") +
         geom_text(aes(y = label_y, label = scales::percent(label_y, accuracy = .1), vjust = 1.5)) +
         scale_y_continuous(name = "population educational attainment rate (cumulative)", labels = scales::percent) +
-        labs(x = "age group", fill = "educational attainment") 
+        labs(x = "age group", fill = "educational attainment")
+
+pums_survey_prime_age %>%
+    arrange(age_gr, rev(degree)) %>%
+    mutate(label_y = cumsum(n) - .5*n) %>%
+    ggplot(aes(fill = degree, x = age_gr, y = n)) +
+        geom_bar(position = "stack", stat = "identity", color = "black") +
+        scale_fill_brewer(palette = "Blues") +
+        geom_text(aes(y = label_y, label = scales::comma(n))) +
+        scale_y_continuous(name = "population", labels = scales::comma) +
+        labs(x = "age group", fill = "educational attainment")
+
+pums_survey_PUMAs <- pums_survey_data %>%
+    filter(AGEP >= 25 & AGEP < 65) %>%
+    group_by(PUMA, has_degree) %>%
+    summarize(
+        pct = survey_mean(proportion = TRUE, vartype = c("ci"), level = 0.95),
+        n = survey_total(vartype = c("ci"), level = 0.95)
+        )
+
+pums_survey_PUMAs %>%
+    filter(has_degree == TRUE) %>%
+    ggplot(aes(fill = has_degree, x = PUMA, y = pct)) +
+        geom_bar(position = "stack", stat = "identity", color = "black") +
+        geom_errorbar(aes(ymin = pct_low, ymax = pct_upp, width = 0.2)) +
+        scale_fill_brewer(palette = "Blues", guide = "none") +
+        geom_text(aes(y = pct/2, label = scales::percent(pct, accuracy = .1))) +
+        scale_y_continuous(name = "educational attainment rate", labels = scales::percent) +
+        labs(x = "PUMA")
+
+pums_survey_RE <- pums_survey_data %>%
+    filter(AGEP >= 25 & AGEP < 65) %>%
+    group_by(race_ethn, has_degree) %>%
+    summarize(
+        pct = survey_mean(proportion = TRUE, vartype = c("ci"), level = 0.95),
+        n = survey_total(vartype = c("ci"), level = 0.95)
+        )
+
+pums_survey_RE %>%
+    filter(has_degree == TRUE) %>%
+    ggplot(aes(fill = has_degree, x = race_ethn, y = pct)) +
+        geom_bar(position = "stack", stat = "identity", color = "black") +
+        geom_errorbar(aes(ymin = pct_low, ymax = pct_upp, width = 0.2)) +
+        scale_fill_brewer(palette = "Blues", guide = "none") +
+        geom_text(aes(y = pct/2, label = scales::percent(pct, accuracy = .1))) +
+        scale_y_continuous(name = "educational attainment rate", labels = scales::percent) +
+        labs(x = "Race/Ethnicity")
 

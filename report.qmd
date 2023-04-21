@@ -1,6 +1,6 @@
 ---
 title: "Educational Attainment in Our Service Area"
-author: "Based on work by Thomas Jay Benjamin as presented at the OAIRP Spring Conference 2023"
+author: "Based on work by Thomas Jay Benjamin as presented at \nthe OAIRP Spring Conference 2023"
 execute:
     echo: false
 params:
@@ -30,7 +30,7 @@ pums_data <- get_pums(
     year = 2021,
     variables = c("AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT"),
     state = "OH",
-    puma = \c(params$PUMA1, params$PUMA2,
+    puma = c(params$PUMA1, params$PUMA2,
         params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
     survey = "acs5",
     recode = TRUE,
@@ -72,29 +72,30 @@ pums_survey_data <- pums_data %>%
             TRUE ~ "0-17"
         ),
         race_ethn = case_when(
-            CIT == "5" ~ "U.S. Nonresident",
-            HISP != "01" ~ "Hispanic or Latino",
+            CIT == "5" ~ "U.S. \nNonresident",
+            HISP != "01" ~ "Hispanic \nor Latino",
             RAC1P == "1" ~ "White",
-            RAC1P == "2" ~ "Black or African American",
-            RAC1P == "9" ~ "Two or more races",
+            RAC1P == "2" ~ "Black or \nAfrican \nAmerican",
+            RAC1P == "9" ~ "Two or more \nraces",
             RAC1P == "6" ~ "Asian",
-            RAC1P == "8" ~ "Unknown / some other race",
-            RAC1P == "3" | RAC1P == "5" ~ "American Indian or Alaska Native",
-            RAC1P == "7" ~ "Native Hawaiian or Pacific Islander",
+            RAC1P == "8" ~ "Unknown / \nsome other \nrace",
+            RAC1P == "3" | RAC1P == "5" ~ "American \nIndian or \nAlaska \nNative",
+            RAC1P == "7" ~ "Native \nHawaiian or \nPacific \nIslander",
             TRUE ~ RAC1P
         )
     )
 ```
 
 
-- After data pre-processing, have data for 7 raw variables we'll be using^[Plus recoded variables and additional identifiers] for the PUMAs associated with the service area for `r params$servicearea`.
-    - AGEP age
-    - CIT citizenship
-    - SCHL educational attainment
-    - ESR employment status
-    - HISP Hispanic/Latino origin
-    - RAC1P race
-    - SOCP occupation
+After data pre-processing, have data for 7 raw variables we'll be using^[Plus recoded variables and additional identifiers] for the PUMAs associated with the service area for **`r params$servicearea`**.
+
+- AGEP age
+- CIT citizenship
+- SCHL educational attainment
+- ESR employment status
+- HISP Hispanic/Latino origin
+- RAC1P race
+- SOCP occupation
 
 ```{R}
 pums_survey_data %>%
@@ -112,15 +113,20 @@ pums_survey_data %>%
 ```
 
 
-## Educational attainment by age group
+## Educational attainment by age
 
- ```{R}
+```{R}
  #| include: false
 pums_survey_prime_age <- pums_survey_data %>%
     filter(AGEP >= 25 & AGEP < 65) %>%
     group_by(age_gr, degree) %>%
-    summarize(n = survey_mean(proportion = TRUE, vartype = c("ci"), level = 0.95))
+    summarize(
+        pct = survey_mean(proportion = TRUE, vartype = c("ci"), level = 0.95),
+        n = survey_total(vartype = c("ci"), level = 0.95)
+        )
 ```
+
+Examining educational attainment rates by age group can help identify how the overall educational attainment rate may change over time, and how a higher education institution can have an impact.
 
 ```{R}
 pums_survey_prime_age %>%
@@ -132,4 +138,70 @@ pums_survey_prime_age %>%
         geom_text(aes(y = label_y, label = scales::percent(label_y, accuracy = .1), vjust = 1.5)) +
         scale_y_continuous(name = "population educational attainment rate (cumulative)", labels = scales::percent) +
         labs(x = "age group", fill = "educational attainment") 
+```
+
+However, attaiment rates do not tell the complete picture, as the age cohorts may not be all the same size.
+
+```{R}
+pums_survey_prime_age %>%
+    arrange(age_gr, rev(degree)) %>%
+    mutate(label_y = cumsum(n) - .5*n) %>%
+    ggplot(aes(fill = degree, x = age_gr, y = n)) +
+        geom_bar(position = "stack", stat = "identity", color = "black") +
+        scale_fill_brewer(palette = "Blues") +
+        geom_text(aes(y = label_y, label = scales::comma(n))) +
+        scale_y_continuous(name = "population", labels = scales::comma) +
+        labs(x = "age group", fill = "educational attainment")
+```
+
+## Educational attainment by demographic factors
+
+### By Public Use Microdata Area (PUMA)
+
+```{R}
+ #| include: false
+pums_survey_PUMAs <- pums_survey_data %>%
+    filter(AGEP >= 25 & AGEP < 65) %>%
+    group_by(PUMA, has_degree) %>%
+    summarize(
+        pct = survey_mean(proportion = TRUE, vartype = c("ci"), level = 0.95),
+        n = survey_total(vartype = c("ci"), level = 0.95)
+        )
+```
+
+```{R}
+pums_survey_PUMAs %>%
+    filter(has_degree == TRUE) %>%
+    ggplot(aes(fill = has_degree, x = PUMA, y = pct)) +
+        geom_bar(position = "stack", stat = "identity", color = "black") +
+        geom_errorbar(aes(ymin = pct_low, ymax = pct_upp, width = 0.2)) +
+        scale_fill_brewer(palette = "Blues", guide = "none") +
+        geom_text(aes(y = pct/2, label = scales::percent(pct, accuracy = .1))) +
+        scale_y_continuous(name = "educational attainment rate", labels = scales::percent) +
+        labs(x = "PUMA")
+```
+
+### By Race & Ethnicity
+
+```{R}
+ #| include: false
+pums_survey_RE <- pums_survey_data %>%
+    filter(AGEP >= 25 & AGEP < 65) %>%
+    group_by(race_ethn, has_degree) %>%
+    summarize(
+        pct = survey_mean(proportion = TRUE, vartype = c("ci"), level = 0.95),
+        n = survey_total(vartype = c("ci"), level = 0.95)
+        )
+```
+
+```{R}
+pums_survey_RE %>%
+    filter(has_degree == TRUE) %>%
+    ggplot(aes(fill = has_degree, x = race_ethn, y = pct)) +
+        geom_bar(position = "stack", stat = "identity", color = "black") +
+        geom_errorbar(aes(ymin = pct_low, ymax = pct_upp, width = 0.2)) +
+        scale_fill_brewer(palette = "Blues", guide = "none") +
+        geom_text(aes(y = pct/2, label = scales::percent(pct, accuracy = .1))) +
+        scale_y_continuous(name = "educational attainment rate", labels = scales::percent) +
+        labs(x = "Race/Ethnicity")
 ```
