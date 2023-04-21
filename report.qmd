@@ -1,9 +1,8 @@
 ---
 title: "Educational Attainment in Our Service Area"
 author: "Based on work by Thomas Jay Benjamin as presented at the OAIRP Spring Conference 2023"
-format:
-    html:
-        code-fold: true
+execute:
+    echo: false
 params:
     servicearea: "LCCC: Lorain County"
     PUMA1: "00801"
@@ -31,8 +30,8 @@ pums_data <- get_pums(
     year = 2021,
     variables = c("AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT"),
     state = "OH",
-    puma = c("00801","00802"), #c(params$PUMA1, params$PUMA2,
-        #params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
+    puma = \c(params$PUMA1, params$PUMA2,
+        params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
     survey = "acs5",
     recode = TRUE,
     rep_weights = "person"
@@ -116,14 +115,21 @@ pums_survey_data %>%
 ## Educational attainment by age group
 
  ```{R}
-pums_survey_data %>%
+ #| include: false
+pums_survey_prime_age <- pums_survey_data %>%
     filter(AGEP >= 25 & AGEP < 65) %>%
     group_by(age_gr, degree) %>%
-    summarize(n = survey_prop(proportion = TRUE, vartype = c("ci"), level = 0.95)) %>%
+    summarize(n = survey_mean(proportion = TRUE, vartype = c("ci"), level = 0.95))
+```
+
+```{R}
+pums_survey_prime_age %>%
     arrange(age_gr, rev(degree)) %>%
     mutate(label_y = cumsum(n)/sum(n)) %>%
     ggplot(aes(fill = degree, x = age_gr, y = n)) +
         geom_bar(position = "fill", stat = "identity", color = "black") +
+        scale_fill_brewer(palette = "Blues") +
         geom_text(aes(y = label_y, label = scales::percent(label_y, accuracy = .1), vjust = 1.5)) +
-        scale_fill_brewer("Blues")
- ```
+        scale_y_continuous(name = "population educational attainment rate (cumulative)", labels = scales::percent) +
+        labs(x = "age group", fill = "educational attainment") 
+```

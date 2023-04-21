@@ -1,2 +1,7 @@
 *.pptx
 presentation_cache/
+presentation_files/
+report_cache/
+report_files/
+*.pdf
+*.html

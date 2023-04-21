@@ -107,15 +107,15 @@ library("knitr")
 ```
 
 ```{R}
-#| echo: false
+#| include: false
 #| cache: true
 # pull ACS PUMS data
 pums_data <- get_pums(
     year = 2021,
     variables = c("AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT"),
     state = "OH",
-    puma = c("00801","00802"), #c(params$PUMA1, params$PUMA2,
-        #params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
+    puma = c(params$PUMA1, params$PUMA2,
+        params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
     survey = "acs5",
     recode = TRUE,
     rep_weights = "person",
@@ -203,7 +203,7 @@ pums_survey_data %>%
 
 ## Educational attainment by age group
 
- ```{R}
+```{R}
 pums_survey_data %>%
     filter(AGEP >= 25 & AGEP < 65) %>%
     group_by(age_gr, degree) %>%
@@ -212,9 +212,11 @@ pums_survey_data %>%
     mutate(label_y = cumsum(n)/sum(n)) %>%
     ggplot(aes(fill = degree, x = age_gr, y = n)) +
         geom_bar(position = "fill", stat = "identity", color = "black") +
+        scale_fill_brewer(palette = "Blues") +
         geom_text(aes(y = label_y, label = scales::percent(label_y, accuracy = .1), vjust = 1.5)) +
-        scale_fill_brewer("Blues")
- ```
+        scale_y_continuous(name = "population educational attainment rate (cumulative)", labels = scales::percent) +
+        labs(x = "age group", fill = "educational attainment") 
+```
 
 # Demo #1: the report
 

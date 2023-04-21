@@ -66,4 +66,37 @@ pums_survey_data <- pums_data %>%
         )
     )
 
+# if export is desired
 # write.csv(pums_survey_data, "test.csv")
+
+# table of pulled data from PUMS
+pums_survey_data %>%
+    group_by(PUMA) %>%
+    summarize(
+        records = n(),
+        weighted = survey_total(vartype = c("ci"), level = 0.95)
+    ) %>%
+    bind_rows(
+        summarize(., across(where(is.numeric), sum),
+            across(where(is.character), ~ 'Total')
+            )
+        ) %>%
+    kable(digits = 0, format.args = list(big.mark = ","))
+
+
+pums_survey_prime_age <- pums_survey_data %>%
+    filter(AGEP >= 25 & AGEP < 65) %>%
+    group_by(age_gr, degree) %>%
+    summarize(n = survey_mean(proportion = TRUE, vartype = c("ci"), level = 0.95))
+
+
+pums_survey_prime_age %>%
+    arrange(age_gr, rev(degree)) %>%
+    mutate(label_y = cumsum(n)/sum(n)) %>%
+    ggplot(aes(fill = degree, x = age_gr, y = n)) +
+        geom_bar(position = "fill", stat = "identity", color = "black") +
+        scale_fill_brewer(palette = "Blues") +
+        geom_text(aes(y = label_y, label = scales::percent(label_y, accuracy = .1), vjust = 1.5)) +
+        scale_y_continuous(name = "population educational attainment rate (cumulative)", labels = scales::percent) +
+        labs(x = "age group", fill = "educational attainment") 
+

@@ -23,3 +23,5 @@ pums_survey_data %>%
         geom_text(aes(y = label_y, label = scales::comma(n))) +
         scale_fill_brewer("Blues")
 
+
+
