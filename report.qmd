@@ -113,6 +113,7 @@ pums_survey_data %>%
     kable(digits = 0, format.args = list(big.mark = ","))
 ```
 
+{{< pagebreak >}}
 
 ## Educational attainment by age
 
@@ -186,6 +187,8 @@ pums_survey_55to64_emp %>%
         )
 ```
 
+{{< pagebreak >}}
+
 ## Educational attainment by demographic factors
 
 For this section, we define the educational attainment rate as the proportion of the prime age working population (25-64) with at least an associate's degree.^[This is consistent with Lumina's [Stronger Nation report.](https://www.luminafoundation.org/stronger-nation/report/#/progress)]
@@ -240,6 +243,8 @@ pums_survey_RE %>%
         labs(x = "Race/Ethnicity")
 ```
 
+{{< pagebreak >}}
+
 ## Top occupations in our service area by educational attainment
 
 ```{R}
@@ -292,6 +297,8 @@ pums_survey_by_occ %>%
         )
 ```
 
+{{< pagebreak >}}
+
 ### Individuals with a graduate degree
 
 ```{R}
@@ -331,6 +338,8 @@ pums_survey_by_occ %>%
             "95%CI UB")
         )
 ```
+
+{{< pagebreak >}}
 
 ### Individuals with only a high school education
 
