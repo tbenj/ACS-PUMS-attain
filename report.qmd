@@ -1,6 +1,7 @@
 ---
-title: "Educational Attainment in Our Service Area"
-author: "Based on work by Thomas Jay Benjamin as presented at \nthe OAIRP Spring Conference 2023"
+title: "Educational Attainment in our Service Area"
+subtitle: "Based on work by Thomas Jay Benjamin for the OAIRP Spring Conference 2023"
+author: "Institutional Research"
 execute:
     echo: false
 params:
@@ -154,7 +155,40 @@ pums_survey_prime_age %>%
         labs(x = "age group", fill = "educational attainment")
 ```
 
+Raising educational attainment may be a necessary strategy to keep good jobs in our area.
+
+```{R}
+#| include: false
+pums_survey_55to64_emp <- pums_survey_data %>%
+    filter(AGEP >= 55 & AGEP < 65 & ESR != 6 & has_degree == TRUE) %>%
+    group_by(SOCP, SOCP_label, has_degree) %>%
+    summarize(
+        n = survey_total(vartype = c("ci"), level = 0.95)
+        )
+```
+
+### Jobs held by 55-64 year olds with at least an associate's degree:
+
+```{R}
+pums_survey_55to64_emp %>%
+    select(SOCP_label, SOCP, n, n_low, n_upp) %>%
+    arrange(-n) %>%
+    head(10) %>%
+    kable(
+        digits = 0,
+        format.args = list(big.mark = ","),
+        col.names = c(
+            "Occupation",
+            "SOC code (ACS)",
+            "# Employed",
+            "95%CI LB",
+            "95%CI UB")
+        )
+```
+
 ## Educational attainment by demographic factors
+
+For this section, we define the educational attainment rate as the proportion of the prime age working population (25-64) with at least an associate's degree.^[This is consistent with Lumina's [Stronger Nation report.](https://www.luminafoundation.org/stronger-nation/report/#/progress)]
 
 ### By Public Use Microdata Area (PUMA)
 
@@ -204,4 +238,136 @@ pums_survey_RE %>%
         geom_text(aes(y = pct/2, label = scales::percent(pct, accuracy = .1))) +
         scale_y_continuous(name = "educational attainment rate", labels = scales::percent) +
         labs(x = "Race/Ethnicity")
+```
+
+## Top occupations in our service area by educational attainment
+
+```{R}
+#| include: false
+pums_survey_by_occ <- pums_survey_data %>%
+    filter(AGEP >= 25 & AGEP < 65 & ESR != 6) %>%
+    group_by(SOCP, SOCP_label, degree) %>%
+    summarize(
+        n = survey_total(vartype = c("ci"), level = 0.95)
+        )
+```
+
+### Individuals with an Associate's degree
+
+```{R}
+pums_survey_by_occ %>%
+    filter(degree == "Associate's degree") %>%
+    select(SOCP_label, SOCP, n, n_low, n_upp) %>%
+    arrange(-n) %>%
+    head(10) %>%
+    kable(
+        digits = 0,
+        format.args = list(big.mark = ","),
+        col.names = c(
+            "Occupation",
+            "SOC code (ACS)",
+            "# Employed",
+            "95%CI LB",
+            "95%CI UB")
+        )
+```
+
+### Individuals with an Bachelor's degree
+
+```{R}
+pums_survey_by_occ %>%
+    filter(degree == "Bachelor's degree") %>%
+    select(SOCP_label, SOCP, n, n_low, n_upp) %>%
+    arrange(-n) %>%
+    head(10) %>%
+    kable(
+        digits = 0,
+        format.args = list(big.mark = ","),
+        col.names = c(
+            "Occupation",
+            "SOC code (ACS)",
+            "# Employed",
+            "95%CI LB",
+            "95%CI UB")
+        )
+```
+
+### Individuals with a graduate degree
+
+```{R}
+pums_survey_by_occ %>%
+    filter(degree == "Graduate degree") %>%
+    select(SOCP_label, SOCP, n, n_low, n_upp) %>%
+    arrange(-n) %>%
+    head(10) %>%
+    kable(
+        digits = 0,
+        format.args = list(big.mark = ","),
+        col.names = c(
+            "Occupation",
+            "SOC code (ACS)",
+            "# Employed",
+            "95%CI LB",
+            "95%CI UB")
+        )
+```
+
+### Individuals with some college, no degree
+
+```{R}
+pums_survey_by_occ %>%
+    filter(degree == "Some college, no degree") %>%
+    select(SOCP_label, SOCP, n, n_low, n_upp) %>%
+    arrange(-n) %>%
+    head(10) %>%
+    kable(
+        digits = 0,
+        format.args = list(big.mark = ","),
+        col.names = c(
+            "Occupation",
+            "SOC code (ACS)",
+            "# Employed",
+            "95%CI LB",
+            "95%CI UB")
+        )
+```
+
+### Individuals with only a high school education
+
+```{R}
+pums_survey_by_occ %>%
+    filter(degree == "High school graduate") %>%
+    select(SOCP_label, SOCP, n, n_low, n_upp) %>%
+    arrange(-n) %>%
+    head(10) %>%
+    kable(
+        digits = 0,
+        format.args = list(big.mark = ","),
+        col.names = c(
+            "Occupation",
+            "SOC code (ACS)",
+            "# Employed",
+            "95%CI LB",
+            "95%CI UB")
+        )
+```
+
+### Individuals with less than a high school education
+
+```{R}
+pums_survey_by_occ %>%
+    filter(degree == "Less than high school") %>%
+    select(SOCP_label, SOCP, n, n_low, n_upp) %>%
+    arrange(-n) %>%
+    head(10) %>%
+    kable(
+        digits = 0,
+        format.args = list(big.mark = ","),
+        col.names = c(
+            "Occupation",
+            "SOC code (ACS)",
+            "# Employed",
+            "95%CI LB",
+            "95%CI UB")
+        )
 ```

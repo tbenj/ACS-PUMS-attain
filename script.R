@@ -149,3 +149,26 @@ pums_survey_RE %>%
         scale_y_continuous(name = "educational attainment rate", labels = scales::percent) +
         labs(x = "Race/Ethnicity")
 
+pums_survey_by_occ <- pums_survey_data %>%
+    filter(AGEP >= 25 & AGEP < 65 & ESR != 6) %>%
+    group_by(SOCP, SOCP_label, degree) %>%
+    summarize(
+        n = survey_total(vartype = c("ci"), level = 0.95)
+        )
+
+# adjust for each attainment level
+pums_survey_by_occ %>%
+    filter(degree == "High school graduate") %>%
+    select(SOCP_label, SOCP, n, n_low, n_upp) %>%
+    arrange(-n) %>%
+    head(10) %>%
+    kable(
+        digits = 0,
+        format.args = list(big.mark = ","),
+        col.names = c(
+            "Occupation",
+            "SOC code (ACS)",
+            "# Employed",
+            "95%CI LB",
+            "95%CI UB")
+        )
