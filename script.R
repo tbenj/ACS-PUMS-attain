@@ -8,7 +8,7 @@ library("knitr")
 # pull ACS PUMS data
 pums_data <- get_pums(
     year = 2021,
-    variables = c("AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT"),
+    variables = c("AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT", "FOD1P"),
     state = "OH",
     puma = c("00801","00802"), #c(params$PUMA1, params$PUMA2,
         #params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
@@ -67,7 +67,7 @@ pums_survey_data <- pums_data %>%
     )
 
 # if export is desired
-# write.csv(pums_survey_data, "test.csv")
+write.csv(pums_survey_data, "test.csv")
 
 # table of pulled data from PUMS
 pums_survey_data %>%

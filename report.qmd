@@ -5,7 +5,7 @@ author: "Institutional Research"
 execute:
     echo: false
 params:
-    servicearea: "LCCC: Lorain County"
+    servicearea: "Lorain County Community College - Lorain County"
     PUMA1: "00801"
     PUMA2: "00802"
     PUMA3: NULL
@@ -25,7 +25,6 @@ library("knitr")
 
 ```{R}
 #| include: false
-#| cache: true
 # pull ACS PUMS data
 pums_data <- get_pums(
     year = 2021,
