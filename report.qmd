@@ -6,10 +6,14 @@ execute:
     echo: false
 params:
     servicearea: "Lorain County Community College - Lorain County"
-    PUMA1: "00801"
-    PUMA2: "00802"
-    PUMA3: NULL
-    PUMA4: NULL
+    PUMA10_1: "00801"
+    PUMA10_2: "00802"
+    PUMA10_3: NULL
+    PUMA10_4: NULL
+    PUMA20_1: "00601"
+    PUMA20_2: "00602"
+    PUMA20_3: NULL
+    PUMA20_4: NULL
 ---
 
 ```{R}
@@ -27,11 +31,12 @@ library("knitr")
 #| include: false
 # pull ACS PUMS data
 pums_data <- get_pums(
-    year = 2021,
-    variables = c("AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT"),
+    year = 2022,
+    variables = c("AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT",
+    "PUMA10", "PUMA20"),
     state = "OH",
-    puma = c(params$PUMA1, params$PUMA2,
-        params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
+    #puma = c(params$PUMA1, params$PUMA2,
+    #    params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
     survey = "acs5",
     recode = TRUE,
     rep_weights = "person"
@@ -82,8 +87,27 @@ pums_survey_data <- pums_data %>%
             RAC1P == "3" | RAC1P == "5" ~ "American \nIndian or \nAlaska \nNative",
             RAC1P == "7" ~ "Native \nHawaiian or \nPacific \nIslander",
             TRUE ~ RAC1P
+        ),
+        PUMA = case_when(
+            PUMA10 %in% c(params$PUMA10_1) ~ "1",
+            PUMA20 %in% c(params$PUMA20_1) ~ "1",
+            PUMA10 %in% c(params$PUMA10_2) ~ "2",
+            PUMA20 %in% c(params$PUMA20_2) ~ "2",
+            PUMA10 %in% c(params$PUMA10_3) ~ "3",
+            PUMA20 %in% c(params$PUMA20_3) ~ "3",
+            PUMA10 %in% c(params$PUMA10_4) ~ "4",
+            PUMA20 %in% c(params$PUMA20_4) ~ "4",
+            TRUE ~ "other"
+        ),
+        county = case_when(
+            PUMA10 %in% c(params$PUMA10_1, params$PUMA10_2,
+        params$PUMA10_3, params$PUMA10_4) ~ "Lorain",
+            PUMA20 %in% c(params$PUMA20_1, params$PUMA20_2,
+        params$PUMA20_3, params$PUMA20_4) ~ "Lorain",
+            TRUE ~ "other"
         )
-    )
+    ) |>
+    filter(county == "Lorain")
 ```
 
 

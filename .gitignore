@@ -5,3 +5,5 @@ report_cache/
 report_files/
 *.pdf
 *.html
+*.csv
+*.xls*

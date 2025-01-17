@@ -7,10 +7,10 @@ library("knitr")
 
 # pull ACS PUMS data
 pums_data <- get_pums(
-    year = 2021,
-    variables = c("AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT", "FOD1P"),
+    year = 2022,
+    variables = c("AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT", "FOD1P", "PUMA10", "PUMA20", "WKHP", "HINS1"),
     state = "OH",
-    puma = c("00801","00802"), #c(params$PUMA1, params$PUMA2,
+    #puma = c("00601", "00602"), #c(params$PUMA1, params$PUMA2,
         #params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
     survey = "acs5",
     recode = TRUE,
@@ -63,15 +63,32 @@ pums_survey_data <- pums_data %>%
             RAC1P == "3" | RAC1P == "5" ~ "American Indian or Alaska Native",
             RAC1P == "7" ~ "Native Hawaiian or Pacific Islander",
             TRUE ~ RAC1P
+        ),
+        PUMA = case_when(
+            PUMA10 == "00801" ~ 1,
+            PUMA20 == "00601" ~ 1,
+            PUMA10 == "00802" ~ 2,
+            PUMA20 == "00602" ~ 2,
+            TRUE ~ 0
+        ),
+        is_lorain_co = case_when(
+            PUMA10 %in% c("00801", "00802") ~ "LC",
+            PUMA20 %in% c("00601", "00602") ~ "LC",
+            TRUE ~ "other"
+        ),
+        work_ft = case_when(
+            WKHP >= 30 ~ "FT",
+            WKHP >= 1 ~ "PT",
+            TRUE ~ "NW"
         )
     )
 
 # if export is desired
-write.csv(pums_survey_data, "test.csv")
+write.csv(pums_data, "test2022work.csv")
 
 # table of pulled data from PUMS
 pums_survey_data %>%
-    group_by(PUMA) %>%
+    group_by(is_lorain_co) |>
     summarize(
         records = n(),
         weighted = survey_total(vartype = c("ci"), level = 0.95)
@@ -86,7 +103,7 @@ pums_survey_data %>%
 
 pums_survey_prime_age <- pums_survey_data %>%
     filter(AGEP >= 25 & AGEP < 65) %>%
-    group_by(age_gr, degree) %>%
+    group_by(is_lorain_co, degree) %>%
     summarize(
         pct = survey_mean(proportion = TRUE, vartype = c("ci"), level = 0.95),
         n = survey_total(vartype = c("ci"), level = 0.95)
