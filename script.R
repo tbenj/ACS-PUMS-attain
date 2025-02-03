@@ -7,8 +7,8 @@ library("knitr")
 
 # pull ACS PUMS data
 pums_data <- get_pums(
-    year = 2022,
-    variables = c("AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT", "FOD1P", "PUMA10", "PUMA20", "WKHP", "HINS1"),
+    year = 2023,
+    variables = c("PUMA", "AGEP", "SCHL", "ESR", "SOCP", "HISP", "RAC1P", "CIT", "FOD1P", "WKHP", "HINS1"),
     state = "OH",
     #puma = c("00601", "00602"), #c(params$PUMA1, params$PUMA2,
         #params$PUMA3, params$PUMA4), # in YAML params$PUMAs = c("00801","00802")
@@ -64,16 +64,9 @@ pums_survey_data <- pums_data %>%
             RAC1P == "7" ~ "Native Hawaiian or Pacific Islander",
             TRUE ~ RAC1P
         ),
-        PUMA = case_when(
-            PUMA10 == "00801" ~ 1,
-            PUMA20 == "00601" ~ 1,
-            PUMA10 == "00802" ~ 2,
-            PUMA20 == "00602" ~ 2,
-            TRUE ~ 0
-        ),
         is_lorain_co = case_when(
-            PUMA10 %in% c("00801", "00802") ~ "LC",
-            PUMA20 %in% c("00601", "00602") ~ "LC",
+            PUMA %in% c("00601", "00602") ~ "Lorain Co.",
+            PUMA %in% c("00500") ~ "Erie/Huron Co.",
             TRUE ~ "other"
         ),
         work_ft = case_when(
@@ -84,7 +77,7 @@ pums_survey_data <- pums_data %>%
     )
 
 # if export is desired
-write.csv(pums_data, "test2022work.csv")
+write.csv(pums_data, "test2023.csv")
 
 # table of pulled data from PUMS
 pums_survey_data %>%
